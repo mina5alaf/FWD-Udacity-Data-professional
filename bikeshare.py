@@ -2,15 +2,15 @@ import time
 import pandas as pd
 import numpy as np
 
-CITY_DATA = {'chicago': 'chicago.csv',
-             'new york city': 'new_york_city.csv',
-             'washington': 'washington.csv'}
+CITY_DATA = {'Chicago': 'chicago.csv',
+             'New york city': 'new_york_city.csv',
+             'Washington': 'washington.csv'}
 
-MONTHS_NUMBER = {'all': 0, 'january': 1, 'february': 2,
-                 'march': 3, 'april': 4,
-                 'may': 5, 'june': 6,
-                 'july': 7, 'august': 8}
-DAYS = ['all', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+MONTHS_NUMBER = {'All': 0, 'January': 1, 'February': 2,
+                 'March': 3, 'April': 4,
+                 'May': 5, 'June': 6,
+                 'July': 7, 'August': 8}
+DAYS = ['All', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 
 def get_filters():
@@ -25,17 +25,17 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     city = input("Enter city name: ")
-    while city not in CITY_DATA.keys():
+    while city.capitalize() not in CITY_DATA.keys():
         city = input("Enter Valid city name: ")
 
     # get user input for month (all, january, february, ... , june)
-    month = input("Enter month name")
-    while month not in MONTHS_NUMBER.keys():
+    month = input("Enter month name: ")
+    while month.capitalize() not in MONTHS_NUMBER.keys():
         city = input("Enter VALID month!!: ")
 
     # get user input for day of week (all, monday, tuesday, ... sunday)
-    day = input("Enter day name")
-    while day not in DAYS:
+    day = input("Enter day name: ")
+    while day.capitalize() not in DAYS:
         city = input("Enter VALID Day!!: ")
     print('-' * 40)
     return city, month, day
@@ -52,20 +52,20 @@ def load_data(city, month, day):
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
-    filename = CITY_DATA[city]
+    filename = CITY_DATA[city.capitalize()]
     df = pd.read_csv(filename)
     df['Start Time'] = pd.to_datetime(df['Start Time'])
     df['month'] = df['Start Time'].dt.month
     df['day_of_week'] = df['Start Time'].dt.day_name()
 
     if month == "all" and day != "all":
-        df = df[df['day_of_week'] == day]
+        df = df[df['day_of_week'] == day.capitalize()]
 
     elif month != "all" and day == "all":
-        df = df[df['month'] == MONTHS_NUMBER[month]]
+        df = df[df['month'] == MONTHS_NUMBER[month.capitalize()]]
 
     elif month != "all" and day != "all":
-        df = df[(df['day_of_week'] == day & df['month'] == MONTHS_NUMBER[month])]
+        df = df[(df['day_of_week'] == day & df['month'] == MONTHS_NUMBER[month.capitalize()])]
 
     return df
 
@@ -143,20 +143,27 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
-    user_types = df['User Type'].value_counts()
-    print('user count {}'.format(user_types))
+    if 'User Type' in df.columns:
+        user_types = df['User Type'].value_counts()
+        print('user count {}'.format(user_types))
 
     # Display counts of gender
-    gender = df['Gender'].value_counts()
-    print('user count {}'.format(gender))
+    if 'Gender' in df.columns:
+        gender = df['Gender'].value_counts()
+        print('user count {}'.format(gender))
+    else:
+        print('Gender is not a column in our dataset')
 
     # Display earliest, most recent, and most common year of birth
-    earliest_year = df['Birth Year'].min()
-    latest_year = df['Birth Year'].max()
-    most_common = df['Birth Year'].mode()
-    print('{} is Earliest birth year,'
-          ' {} is Latest birth year,'
-          ' {} is the most common year'.format(earliest_year, latest_year, most_common))
+    if 'Birth Year' in df.columns:
+        earliest_year = df['Birth Year'].min()
+        latest_year = df['Birth Year'].max()
+        most_common = df['Birth Year'].mode()
+        print('{} is Earliest birth year,'
+              ' {} is Latest birth year,'
+              ' {} is the most common year'.format(earliest_year, latest_year, most_common))
+    else:
+        print('Birth year is not a column in our dataset')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-' * 40)
